@@ -1,4 +1,6 @@
 using PdfToVideo;
+using System;
+using System.IO;
 
 namespace PdfToVideo
 {
@@ -6,17 +8,19 @@ namespace PdfToVideo
     {
         static void Main(string[] args)
         {
-            if (args.Length == 0)
+            string input = args.Length > 0 ? args[0] : null;
+            if (string.IsNullOrWhiteSpace(input))
             {
-                Console.WriteLine("Usage: PdfToVideo <pdf-file-path>");
-                return;
+                string defaultPath = Path.GetFullPath(Path.Combine("pdfs", "sample.pdf"));
+                input = new Uri(defaultPath).AbsoluteUri;
+                Console.WriteLine($"No input provided. Using default: {input}");
             }
 
-            string pdfPath = args[0];
+            Uri pdfUri = new Uri(input);
 
             try
             {
-                PdfContent content = PdfParser.Extract(pdfPath);
+                PdfContent content = PdfParser.Extract(pdfUri);
                 Console.WriteLine("Text extracted from PDF:\n");
                 Console.WriteLine(content.Text);
                 Console.WriteLine($"Total images extracted: {content.Images.Count}");

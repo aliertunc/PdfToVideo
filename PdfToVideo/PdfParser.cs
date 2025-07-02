@@ -1,10 +1,13 @@
 using System.Text;
+using System.Collections.Generic;
+using System.IO;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Pdf.Colorspace;
 using iText.Kernel.Pdf.Filters;
+using System.Net.Http;
 
 namespace PdfToVideo
 {
@@ -45,6 +48,27 @@ namespace PdfToVideo
             }
 
             return new PdfContent(textBuilder.ToString(), images);
+        }
+
+        public static PdfContent Extract(Uri pdfUri)
+        {
+            if (pdfUri.IsFile)
+            {
+                return Extract(pdfUri.LocalPath);
+            }
+
+            using var client = new HttpClient();
+            byte[] data = client.GetByteArrayAsync(pdfUri).Result;
+            string tmp = Path.GetTempFileName();
+            File.WriteAllBytes(tmp, data);
+            try
+            {
+                return Extract(tmp);
+            }
+            finally
+            {
+                try { File.Delete(tmp); } catch { }
+            }
         }
     }
 }
