@@ -1,10 +1,14 @@
-using System.Text;
+using System.Text; 
+using System.Collections.Generic;
+using System.IO; 
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using iText.Kernel.Pdf.Xobject;
 using iText.Kernel.Pdf.Colorspace;
-using iText.Kernel.Pdf.Filters;
+using iText.Kernel.Pdf.Filters; 
+using System.Net.Http;
+ 
 
 namespace PdfToVideo
 {
@@ -36,15 +40,51 @@ namespace PdfToVideo
                         var obj = xObjects.GetAsStream(name);
                         var subtype = obj.GetAsName(PdfName.Subtype);
                         if (subtype != null && subtype.Equals(PdfName.Image))
-                        {
+                        { 
+                            try
+                            {
+                                var bytes = obj.GetBytes();
+                                images.Add(bytes);
+                            }
+                            catch (iText.Kernel.PdfException ex)
+                            {
+                                if (ex.Message?.Contains("JBIG2Decode") == true)
+                                {
+                                    // Skip images encoded with JBIG2 as itext7
+                                    // cannot decode them without commercial add-ons
+                                    continue;
+                                }
+                                throw;
+                            } 
                             var bytes = obj.GetBytes();
-                            images.Add(bytes);
+                            images.Add(bytes); 
                         }
                     }
                 }
             }
 
             return new PdfContent(textBuilder.ToString(), images);
-        }
+        } 
+
+        public static PdfContent Extract(Uri pdfUri)
+        {
+            if (pdfUri.IsFile)
+            {
+                return Extract(pdfUri.LocalPath);
+            }
+
+            using var client = new HttpClient();
+            byte[] data = client.GetByteArrayAsync(pdfUri).Result;
+            string tmp = Path.GetTempFileName();
+            File.WriteAllBytes(tmp, data);
+            try
+            {
+                return Extract(tmp);
+            }
+            finally
+            {
+                try { File.Delete(tmp); } catch { }
+            }
+        } 
     }
 }
