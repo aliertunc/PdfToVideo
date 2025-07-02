@@ -49,7 +49,7 @@ namespace PdfToVideo
                             {
                                 if (ex.Message?.Contains("JBIG2Decode") == true)
                                 {
-                                    // Skip images encoded with JBIG2 as itext7
+                                    // Skip images encoded with JBIG2 as iText7
                                     // cannot decode them without commercial add-ons
                                     continue;
                                 }
