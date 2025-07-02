@@ -11,7 +11,9 @@ namespace PdfToVideo
             string input = args.Length > 0 ? args[0] : null;
             if (string.IsNullOrWhiteSpace(input))
             {
-                string defaultPath = Path.GetFullPath(Path.Combine("pdfs", "sample.pdf"));
+                string defaultPath = "C:\\Users\\GamePc\\OneDrive\\Masaüstü\\AI Projesi\\NetProjects\\PdfToVideo\\pdfs\\hp.pdf";
+                //Path.GetFullPath(Path.Combine("pdfs", "s.pdf"));
+
                 input = new Uri(defaultPath).AbsoluteUri;
                 Console.WriteLine($"No input provided. Using default: {input}");
             }
