@@ -43,10 +43,10 @@ namespace PdfToVideo
                         { 
                             try
                             {
-                                var bytes = obj.GetBytes();
-                                images.Add(bytes);
+                                var bytes2 = obj.GetBytes();
+                                images.Add(bytes2);
                             }
-                            catch (iText.Kernel.PdfException ex)
+                            catch (Exception ex)
                             {
                                 if (ex.Message?.Contains("JBIG2Decode") == true)
                                 {
